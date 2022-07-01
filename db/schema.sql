@@ -23,7 +23,7 @@ CREATE TABLE role (
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INTEGER NOT NULL,
-    manager_id INTEGER NOT NULL,
+    manager_id INTEGER NULL,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
     ON DELETE RESTRICT ON UPDATE CASCADE,
