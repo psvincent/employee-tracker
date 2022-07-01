@@ -6,7 +6,6 @@ USE employee_database;
 CREATE TABLE department (
     id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(30) NOT NULL
-    PRIMARY KEY (id)
 );
 
 CREATE TABLE role (
@@ -17,7 +16,6 @@ CREATE TABLE role (
     FOREIGN KEY (department_id)
     REFERENCES department(id)
     ON DELETE CASCADE ON UPDATE CASCADE
-    PRIMARY KEY (id)
  );
 
  CREATE TABLE employee (
@@ -33,5 +31,4 @@ CREATE TABLE role (
     REFERENCES employee(id)
     ON DELETE SET NULL
     ON UPDATE CASCADE
-    PRIMARY KEY (id)
  );

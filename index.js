@@ -1,20 +1,20 @@
 const inquirer = require("inquirer");
 require('dotenv').config();
-// const mysql = require('mysql');
-const mysql = require("mysql2");
+const mysql = require('mysql');
+const mysql2 = require("mysql2");
 const consoleTable = require("console.table");
 const figlet = require('figlet');
 const { allowedNodeEnvironmentFlags, title } = require('process');
 
-const connection = mysql.createConnection({
+const connect = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "rootroot",
-    // database: employee_database
+    password: "root",
+    database: "employee_database"
 });
 
-connection.connect((err) => {
+connect.connect((err) => {
     if (err) throw err;
     console.log("Connected!");
     // console.log("Employee Tracker", function(err, data) {
@@ -35,7 +35,7 @@ function startTracker() {
         choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update an employee role"]
     }]
 
-    inquirer.prompts(firstQuestion) 
+    inquirer.prompt(firstQuestion) 
     .then(response => {
         switch (response.action) {
             case "View all departments":
@@ -84,7 +84,7 @@ const viewAll = (table) => {
         LEFT JOIN DEPARTMENT AS D ON R.department_id = D.id
         LEFT JOIN EMPLOYEE AS M ON E.manager_id = M.id;`;
     }
-    connection.query(query, (err, res) => {
+    connect.query(query, (err, res) => {
         if (err) throw err;
         console.table(res);
 
@@ -102,7 +102,7 @@ function addDepartment() {
     inquirer.prompt(questions)
     .then(response => {
         const query = `INSERT INTO department (name) VALUES (?)`;
-        connection.query(query, [response.name], (err, res) => {
+        connect.query(query, [response.name], (err, res) => {
             if (err) throw err;
             console.log(`New Department: ${response.name} has been created.` );
             startTracker();
@@ -115,7 +115,7 @@ function addDepartment() {
 
 function addRoll() {
     const departments = [];
-    connection.query(`SELECT * FROM DEPARTMENT`, (err, res) => {
+    connect.query(`SELECT * FROM DEPARTMENT`, (err, res) => {
         if (err) throw err;
         res.forEach(dep => {
             let questionObject = {
@@ -147,7 +147,7 @@ function addRoll() {
     inquirer.prompt(questions)
     .then(response => {
         const query = `INSERT INTO ROLE (title, salary, department_id) VALUES (?)`;
-        connection.query(query, [[response.title, response.salary, response.department]], (err, res) => {
+        connect.query(query, [[response.title, response.salary, response.department]], (err, res) => {
             if (err) throw err;
             console.log(`New Role: ${response.title} has been added to roles.`);
             startTracker();
@@ -160,7 +160,7 @@ function addRoll() {
 }
 
 function addEmployee() {
-    connection.query(`SELECT * FROM EMPLOYEE`, (err, employeeRes) => {
+    connect.query(`SELECT * FROM EMPLOYEE`, (err, employeeRes) => {
         if (err) throw err;
         const employeeChoice = [{
             name: 'None',
@@ -173,7 +173,7 @@ function addEmployee() {
             });
         });
 
-        connection.query(`SELECT * FROM ROLE`, (err, roleRes) => {
+        connect.query(`SELECT * FROM ROLE`, (err, roleRes) => {
             if(err) throw err;
             const roleChoice = [];
             roleRes.forEach(({ title, id }) => {
@@ -212,7 +212,7 @@ function addEmployee() {
             .then(response => {
                 const query = `INSERT INTO EMPLOYEE (first_name, last_name, role_id, manager_id) VALUES (?)`;
                 let manager_id = response.manager_id !== 0? response.manager_id: null;
-                connection.query(query, [[response.first_name, response.last_name, response.role_id, manager_id]], (err, res) => {
+                connect.query(query, [[response.first_name, response.last_name, response.role_id, manager_id]], (err, res) => {
                     if (err) throw err;
                     console.log(`Added employee: ${response.first_name} ${response.last_name}.`);
                     startTracker();
@@ -226,7 +226,7 @@ function addEmployee() {
 };
 
 function updateRole() {
-    connection.query(`SELECT * FROM EMPLOYEE`, (err, employeeRes) => {
+    connect.query(`SELECT * FROM EMPLOYEE`, (err, employeeRes) => {
         if (err) throw err;
         const employeeChoice = [];
         employeeRes.forEach(({ first_name, last_name, id}) => {
@@ -236,7 +236,7 @@ function updateRole() {
             });
         });
 
-        connection.query(`SELECT * FROM ROLE`, (err, roleRes) => {
+        connect.query(`SELECT * FROM ROLE`, (err, roleRes) => {
             if (err) throw err;
             const roleChoice = [];
             roleRes.forEach(({ title_id }) => {
@@ -264,7 +264,7 @@ function updateRole() {
             inquirer.prompt(questions)
             .then(response => {
                 const query = `UPDATE EMPLOYEE SET ? WHERE ?? = ?;`;
-                connection.query(query, [
+                connect.query(query, [
                     { role_id: response.role_id},
                     "id",
                     response.id
