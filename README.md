@@ -8,3 +8,4 @@ This is an employee tracker that allows the user to add departments, employees, 
 
 https://user-images.githubusercontent.com/97009239/176987845-0a772dd1-4c20-4fcd-85ce-7e953d2cfcbd.mp4
 
+Everything is working in this demo video besides the "update an employee role" function.
